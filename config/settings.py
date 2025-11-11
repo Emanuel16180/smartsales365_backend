@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -126,6 +128,15 @@ SIMPLE_JWT = {
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+
+
+# Permite que cualquier dominio acceda a tu API
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Permite que los navegadores envíen cualquier header,
+# incluido 'Authorization' y 'Content-Type'
+CORS_ALLOW_HEADERS = ["*"]
+
 
 # Usuario personalizado
 AUTH_USER_MODEL = 'users.User'
