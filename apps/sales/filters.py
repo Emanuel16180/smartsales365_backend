@@ -19,11 +19,9 @@ class SaleFilter(django_filters.FilterSet):
     year = django_filters.NumberFilter(field_name='created_at__year')
 
     # 3. Filtro por Producto (busca en los SaleDetail)
-    product_name = django_filters.CharFilter(
-        field_name='details__product__name',  # Busca en el nombre del producto
-        lookup_expr='icontains',              # 'icontains' = no sensible a mayúsculas
-        distinct=True,
-        label="Buscar por Nombre de Producto"
+    product_search = django_filters.CharFilter(
+        method='filter_by_product_or_category', # <-- Usamos un método
+        label="Buscar por Nombre de Producto o Categoría"
     )
     # 4. Filtro por Monto (Rango)
     monto_min = django_filters.NumberFilter(field_name='total_amount', lookup_expr='gte')
@@ -36,19 +34,48 @@ class SaleFilter(django_filters.FilterSet):
     class Meta:
         model = Sale
         # Define los campos que se pueden filtrar exactamente (además de los personalizados)
-        fields = ['status', 'client_search', 'month', 'year', 'product_name', 'monto_min', 'monto_max', 'fecha_inicio', 'fecha_fin']
+        fields = ['status', 'client_search', 'month', 'year', 'product_search', 'monto_min', 'monto_max', 'fecha_inicio', 'fecha_fin']
 
 
     def filter_by_client_name_or_email(self, queryset, name, value):
-            """
-            Filtra el queryset por nombre, apellido o email del usuario.
-            """
-            if not value:
-                return queryset
-            
-            # Busca el texto 'value' en cualquiera de estos tres campos
-            return queryset.filter(
-                Q(user__first_name__icontains=value) |
-                Q(user__last_name__icontains=value) |
-                Q(user__email__icontains=value)
-            ).distinct()
+        """
+        Filtra el queryset por nombre, apellido o email.
+        (ACTUALIZADO) Ahora soporta múltiples palabras (ej. "Ana Gomez").
+        """
+        if not value:
+            return queryset
+        
+        # 1. Buscar por email (coincidencia simple)
+        email_query = Q(user__email__icontains=value)
+        
+        # 2. Construir consulta de nombre (más compleja)
+        # Divide la búsqueda por espacios (ej. "Ana Gomez" -> ["Ana", "Gomez"])
+        name_parts = value.split()
+        
+        # Inicia una consulta "AND" vacía
+        name_query = Q()
+        
+        for part in name_parts:
+            # Añade una condición "AND" por cada parte
+            # La parte ("Ana") debe estar en el nombre O en el apellido
+            name_query &= (
+                Q(user__first_name__icontains=part) |
+                Q(user__last_name__icontains=part)
+            )
+        
+        # 3. Combinar las búsquedas
+        # Devuelve resultados que coincidan con el email O con la búsqueda de nombre
+        return queryset.filter(email_query | name_query).distinct()
+
+    def filter_by_product_or_category(self, queryset, name, value):
+        """
+        Filtra el queryset por nombre de producto O nombre de categoría
+        en los detalles de la venta.
+        """
+        if not value:
+            return queryset
+        
+        return queryset.filter(
+            Q(details__product__name__icontains=value) |
+            Q(details__product__category__name__icontains=value)
+        ).distinct()
