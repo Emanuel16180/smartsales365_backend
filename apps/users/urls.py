@@ -3,7 +3,8 @@ from .views import (
     RegisterView, 
     UserProfileView, 
     CustomTokenObtainPairView,
-    TokenRefreshView
+    TokenRefreshView,
+    CustomerListView
 )
 
 urlpatterns = [
@@ -25,4 +26,6 @@ urlpatterns = [
     # GET, PUT, PATCH /api/v1/users/me/
     # (Requiere token de acceso en el header 'Authorization: Bearer <token>')
     path('me/', UserProfileView.as_view(), name='user_profile'),
+
+    path('admin/customers/', CustomerListView.as_view(), name='admin-customer-list'),
 ]

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView as BaseTokenObtainPairView,
     TokenRefreshView,
 )
+from rest_framework.permissions import IsAdminUser
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -25,3 +26,19 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
 class CustomTokenObtainPairView(BaseTokenObtainPairView):
     pass
+
+class CustomerListView(generics.ListAPIView):
+    """
+    Endpoint (Solo Admin) para listar todos los usuarios
+    que tienen el rol de 'CUSTOMER'.
+    """
+    # 1. Permiso: Solo administradores (o 'is_staff=True')
+    permission_classes = [IsAdminUser]
+    
+    # 2. Serializer: Usa el serializer de User que ya tienes
+    serializer_class = UserSerializer
+
+    # 3. Queryset: Define el filtro
+    def get_queryset(self):
+        # Filtra el modelo User por el rol 'CUSTOMER'
+        return User.objects.filter(role=User.Role.CUSTOMER).order_by('email')
