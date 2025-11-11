@@ -150,3 +150,10 @@ class ProductSerializer(serializers.ModelSerializer):
         
         # Actualiza el producto con el resto de los datos
         return super().update(instance, validated_data)
+
+class BrandSerializer(serializers.ModelSerializer):
+    """ Serializador para listar, crear o modificar Marcas. """
+    class Meta:
+        # Asegúrate de que el modelo Brand ya esté importado
+        model = Brand
+        fields = '__all__'
