@@ -1,0 +1,61 @@
+# ------------------------------------
+# PYTHON / DJANGO
+# ------------------------------------
+*.pyc
+__pycache__/
+*.pyd
+*.so
+*.egg-info/
+build/
+dist/
+.env
+
+# Base de datos local (PostgreSQL no genera esto, pero es buena práctica)
+db.sqlite3
+
+# Archivos de la sesión de Django
+*.log
+*.pid
+*.pot
+
+# Archivos de Migraciones (Si trabajas en equipo y las recreas a menudo)
+# Conservar el __init__.py es importante
+*/migrations/*
+!*/migrations/__init__.py
+
+# Static y Media files (archivos subidos y compilados)
+/static/
+/media/
+
+
+# ------------------------------------
+# ENTORNO VIRTUAL
+# ------------------------------------
+.venv/
+venv/
+env/
+VENV/
+.Python
+pip-selfcheck.json
+.vscode/
+
+# ------------------------------------
+# MACHINE LEARNING / DATOS GENERADOS
+# ------------------------------------
+# Archivos del modelo de IA (serializados)
+*.joblib
+*.pkl
+
+# Archivos de dataset generados por dataset_generator.py
+/apps/ai/data/training_dataset.csv
+/apps/ai/data/*.joblib
+
+# ------------------------------------
+# ARCHIVOS DEL SISTEMA / EDITOR
+# ------------------------------------
+.DS_Store
+.vscode/*
+!/settings.json
+!/launch.json
+*.sublime-project
+*.idea/
